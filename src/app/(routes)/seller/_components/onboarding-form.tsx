@@ -211,7 +211,7 @@ const OnboardingForm = () => {
                   <div>
                     <h3 className="font-semibold">{type}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {modalData[type].description}
+                      {modalData[type as BusinessTypeKeys].description}
                     </p>
                     <div
                       onClick={() =>
