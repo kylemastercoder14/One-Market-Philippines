@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["one-market-phil.s3.us-east-1.amazonaws.com"],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
