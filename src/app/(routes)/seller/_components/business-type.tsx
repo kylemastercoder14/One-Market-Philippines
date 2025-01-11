@@ -14,11 +14,13 @@ const RadioContext = createContext<RadioContextValue | null>(null);
 // BusinessType Component
 const BusinessType = ({
   children,
+  disabled,
   value,
   ...props
 }: {
   children: React.ReactNode;
   value: string;
+  disabled?: boolean;
 }) => {
   const context = useContext(RadioContext);
 
@@ -39,6 +41,7 @@ const BusinessType = ({
       <input
         type="radio"
         className="hidden"
+        disabled={disabled}
         {...props}
         value={value}
         checked={selectedValue === value}

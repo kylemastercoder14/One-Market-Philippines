@@ -28,8 +28,8 @@ const Register = () => {
           </div>
         </div>
       </header>
-      <div className="w-full relative place-items-center grid md:grid-cols-10 grid-cols-1 px-40 gap-10 mt-20">
-        <div className="h-[500px] w-full col-span-5">
+      <div className="w-full relative place-items-center grid md:grid-cols-10 grid-cols-1 px-80 gap-10 mt-20">
+        <div className="h-[500px] w-full col-span-6">
           <h2 className="bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-700 dark:from-neutral-600 dark:to-white text-2xl md:text-4xl lg:text-7xl font-sans py-2 md:py-10 relative z-20 font-bold tracking-tight">
             Grow your business with{" "}
             <span className="text-orange-600">1 Market Philippines</span> today!
@@ -52,7 +52,7 @@ const Register = () => {
             )}
           />
         </div>
-        <div className="col-span-5">
+        <div className="col-span-4">
           <div className="bg-white shadow-lg border px-6 py-6 rounded-md">
             <h3 className="font-helveticaBold text-2xl">Sign Up</h3>
             <div className="flex items-center gap-2">

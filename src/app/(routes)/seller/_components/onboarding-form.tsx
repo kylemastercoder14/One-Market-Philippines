@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-comment-textnodes */
 "use client";
 
 import React, { useState } from "react";
@@ -19,17 +18,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import AlertModal from "@/components/ui/alert-modal";
+import { toast } from "sonner";
+import { finishingSellerData } from "@/actions/seller";
 
 const OnboardingForm = () => {
   const searchParams = useSearchParams();
-  const [selectedValue, setSelectedValue] = useState("individual");
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [selectedValue, setSelectedValue] = useState("Individual");
   const [cancelModal, setCancelModal] = useState(false);
   const [shopName, setShopName] = useState("");
   const [category, setCategory] = useState("");
-  const [identificationType, setIdentificationType] = useState("");
+  const [identificationType, setIdentificationType] = useState("SSS");
   const [dynamicModal, setDynamicModal] = useState(false);
+  const [identityModal, setIdentityModal] = useState(false);
+  const [identityContent, setIdentityContent] = useState<string>("");
+  const [dti, setDti] = useState("");
+  const [bir, setBir] = useState("");
+  const [sec, setSec] = useState("");
+  const [givenName, setGivenName] = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [familyName, setFamilyName] = useState("");
+  const [identity, setIdentity] = useState("");
+  const [dtiSampleModal, setDtiSampleModal] = useState(false);
+  const [birSampleModal, setBirSampleModal] = useState(false);
+  const [secSampleModal, setSecSampleModal] = useState(false);
   const [modalContent, setModalContent] = useState<{
     title: string;
     description: string;
@@ -158,8 +173,73 @@ const OnboardingForm = () => {
     setDynamicModal(true);
   };
 
+  const handleViewSampleIdentity = (type: string) => {
+    setIdentityContent(type);
+    setIdentityModal(true);
+  };
+
   const handleCancel = () => {
     window.location.assign("/seller/account/register");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (selectedValue === "Individual" && !identificationType) {
+      toast.error("This field is required");
+      return;
+    }
+
+    if (selectedValue === "Sole-Proprietorship" && !dti) {
+      toast.error("This field is required");
+      return;
+    }
+
+    if (selectedValue === "Corporation" && !sec) {
+      toast.error("This field is required");
+      return;
+    }
+
+    if (selectedValue === "Partnership" && !sec) {
+      toast.error("This field is required");
+      return;
+    }
+
+    if (!shopName || !category || !givenName || !familyName || !identity) {
+      toast.error("This field is required");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await finishingSellerData(
+        shopName,
+        category,
+        selectedValue,
+        identificationType,
+        dti,
+        bir,
+        sec,
+        givenName,
+        middleName,
+        familyName,
+        identity,
+        searchParams.get("email") || ""
+      );
+
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        toast.success(res.success);
+        router.push(`/seller/${res.seller?.id}/dashboard`);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -199,7 +279,101 @@ const OnboardingForm = () => {
           Got it
         </Button>
       </Modal>
-      <form>
+      <Modal
+        title={""}
+        description={""}
+        onClose={() => setIdentityModal(false)}
+        isOpen={identityModal}
+      >
+        <div className="relative w-full h-[30vh]">
+          {identityContent === "UMID" && (
+            <Image
+              src={"/sample-id/umid.png"}
+              alt="UMID"
+              fill
+              className="w-full h-full"
+            />
+          )}
+          {identityContent === "SSS" && (
+            <Image
+              src={"/sample-id/sss.png"}
+              alt="SSS"
+              fill
+              className="w-full h-full"
+            />
+          )}
+          {identityContent === "TIN ID" && (
+            <Image
+              src={"/sample-id/tin.png"}
+              alt="TIN ID"
+              fill
+              className="w-full h-full"
+            />
+          )}
+          {identityContent === "Voter's ID" && (
+            <Image
+              src={"/sample-id/voters.png"}
+              alt="Voter's ID"
+              fill
+              className="w-full h-full"
+            />
+          )}
+          {identityContent === "Postal ID" && (
+            <Image
+              src={"/sample-id/postal.png"}
+              alt="Postal ID"
+              fill
+              className="w-full h-full"
+            />
+          )}
+        </div>
+      </Modal>
+      <Modal
+        title={""}
+        description={""}
+        onClose={() => setDtiSampleModal(false)}
+        isOpen={dtiSampleModal}
+      >
+        <div className="relative w-full h-[60vh]">
+          <Image
+            src={"/sample-id/dti.jpg"}
+            alt="DTI"
+            fill
+            className="w-full h-full"
+          />
+        </div>
+      </Modal>
+      <Modal
+        title={""}
+        description={""}
+        onClose={() => setBirSampleModal(false)}
+        isOpen={birSampleModal}
+      >
+        <div className="relative w-full h-[60vh]">
+          <Image
+            src={"/sample-id/bir.jpg"}
+            alt="BIR"
+            fill
+            className="w-full h-full"
+          />
+        </div>
+      </Modal>
+      <Modal
+        title={""}
+        description={""}
+        onClose={() => setSecSampleModal(false)}
+        isOpen={secSampleModal}
+      >
+        <div className="relative w-full h-[60vh]">
+          <Image
+            src={"/sample-id/sec.jpg"}
+            alt="SEC"
+            fill
+            className="w-full h-full"
+          />
+        </div>
+      </Modal>
+      <form onSubmit={handleSubmit}>
         <div className="bg-white shadow-sm rounded-md border mt-4 mb-4 py-6 px-5">
           <p className="text-md text-muted-foreground font-semibold">
             Business Type
@@ -207,7 +381,11 @@ const OnboardingForm = () => {
           <RadioGroup value={selectedValue} onChangeAction={setSelectedValue}>
             <div className="flex gap-4 flex-col mt-3">
               {Object.keys(modalData).map((type) => (
-                <BusinessType key={type} value={type as BusinessTypeKeys}>
+                <BusinessType
+                  disabled={loading}
+                  key={type}
+                  value={type as BusinessTypeKeys}
+                >
                   <div>
                     <h3 className="font-semibold">{type}</h3>
                     <p className="text-sm text-muted-foreground">
@@ -240,6 +418,7 @@ const OnboardingForm = () => {
             value={shopName}
             onChange={(e) => setShopName(e.target.value)}
             className="mt-2"
+            disabled={loading}
             placeholder="Please enter a shop name"
           />
           <p className="text-md text-muted-foreground font-semibold mt-7">
@@ -249,7 +428,11 @@ const OnboardingForm = () => {
             Please select the product category you plan to sell. The category
             information filled in here will not affect product uploading.
           </p>
-          <Select onValueChange={setCategory} defaultValue={category}>
+          <Select
+            disabled={loading}
+            onValueChange={setCategory}
+            defaultValue={category}
+          >
             <SelectTrigger className="text-muted-foreground">
               <SelectValue
                 placeholder="Select a product category"
@@ -278,49 +461,149 @@ const OnboardingForm = () => {
             </p>
           </div>
         </div>
-        <div className="bg-white shadow-sm rounded-md border mt-4 mb-4 py-6 px-5">
-          <p className="text-md text-muted-foreground font-semibold mb-2">
-            Type of Identification
-          </p>
-          <Select
-            onValueChange={setIdentificationType}
-            defaultValue={identificationType}
-          >
-            <SelectTrigger className="text-muted-foreground">
-              <SelectValue placeholder="Select type of identifcation" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="UMID">UMID</SelectItem>
-              <SelectItem value="SSS">SSS</SelectItem>
-              <SelectItem value="TIN ID">TIN ID</SelectItem>
-              <SelectItem value="Voter's ID">Voter&apos;s ID</SelectItem>
-              <SelectItem value="National ID">National ID</SelectItem>
-            </SelectContent>
-          </Select>
-          <div className="text-sm text-muted-foreground mt-2 flex flex-col">
-            <p>
-              1. Upload images of the front side of your ID. These images will
-              be used for identity verification purposes.
+        {selectedValue === "Individual" && (
+          <div className="bg-white shadow-sm rounded-md border mt-4 mb-4 py-6 px-5">
+            <p className="text-md text-muted-foreground font-semibold mb-2">
+              Type of Identification
             </p>
-            <p>
-              2. Be sure that your images include all information on the front
-              side of your ID, including any signatures. Images also need to be
-              clear, without any warped or blurred portions.
-            </p>
-            <p>
-              3. Files must be less than 5 MB, and in JPG or PNG format.
-              <span className="font-semibold text-orange-600 cursor-pointer">
-                View Sample
-              </span>
-            </p>
+            <Select
+              disabled={loading}
+              onValueChange={setIdentificationType}
+              defaultValue={identificationType}
+            >
+              <SelectTrigger className="text-muted-foreground">
+                <SelectValue placeholder="Select type of identifcation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="UMID">UMID</SelectItem>
+                <SelectItem value="SSS">SSS</SelectItem>
+                <SelectItem value="TIN ID">TIN ID</SelectItem>
+                <SelectItem value="Voter's ID">Voter&apos;s ID</SelectItem>
+                <SelectItem value="Postal ID">Postal ID</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="text-sm text-muted-foreground mt-2 flex flex-col">
+              <p>
+                1. Upload images of the front side of your ID. These images will
+                be used for identity verification purposes.
+              </p>
+              <p>
+                2. Be sure that your images include all information on the front
+                side of your ID, including any signatures. Images also need to
+                be clear, without any warped or blurred portions.
+              </p>
+              <p>
+                3. Files must be less than 5 MB, and in JPG or PNG format.
+                <span
+                  onClick={() => handleViewSampleIdentity(identificationType)}
+                  className="font-semibold text-orange-600 cursor-pointer"
+                >
+                  View Sample
+                </span>
+              </p>
+            </div>
+            <ImageUpload
+              disabled={loading}
+              imageCount={1}
+              className="mt-5"
+              onImageUpload={(url) => setIdentity(url)}
+              defaultValue={identity}
+            />
           </div>
-          <ImageUpload
-            imageCount={1}
-            className="mt-5"
-            onImageUpload={() => {}}
-            defaultValue=""
-          />
-        </div>
+        )}
+        {selectedValue === "Sole-Proprietorship" && (
+          <div className="bg-white shadow-sm rounded-md border mt-4 mb-4 py-6 px-5">
+            <p className="text-md text-muted-foreground font-semibold mb-2">
+              Upload company registration document
+            </p>
+            <div className="text-sm text-muted-foreground mt-2 flex flex-col">
+              <p>1. Upload your DTI Permit</p>
+              <p>
+                2. Ensure that the characters on the documentation are not
+                deformed or flared.
+              </p>
+              <p>
+                3. The uploaded file must be less than 10 MB, and in JPG, PNG,
+                JPEG or PDF format.
+                <span
+                  onClick={() => setDtiSampleModal(true)}
+                  className="font-semibold text-orange-600 cursor-pointer"
+                >
+                  View Sample
+                </span>
+              </p>
+            </div>
+            <ImageUpload
+              disabled={loading}
+              imageCount={1}
+              className="mt-5"
+              onImageUpload={(url) => setDti(url)}
+              defaultValue={dti}
+            />
+          </div>
+        )}
+        {selectedValue === "Corporation" && (
+          <div className="bg-white shadow-sm rounded-md border mt-4 mb-4 py-6 px-5">
+            <p className="text-md text-muted-foreground font-semibold mb-2">
+              Upload company registration document
+            </p>
+            <div className="text-sm text-muted-foreground mt-2 flex flex-col">
+              <p>1. Upload your SEC Registration</p>
+              <p>
+                2. Ensure that the characters on the documentation are not
+                deformed or flared.
+              </p>
+              <p>
+                3. The uploaded file must be less than 10 MB, and in JPG, PNG,
+                JPEG or PDF format.
+                <span
+                  onClick={() => setSecSampleModal(true)}
+                  className="font-semibold text-orange-600 cursor-pointer"
+                >
+                  View Sample
+                </span>
+              </p>
+            </div>
+            <ImageUpload
+              disabled={loading}
+              imageCount={1}
+              className="mt-5"
+              onImageUpload={(url) => setSec(url)}
+              defaultValue={sec}
+            />
+          </div>
+        )}
+        {selectedValue === "Partnership" && (
+          <div className="bg-white shadow-sm rounded-md border mt-4 mb-4 py-6 px-5">
+            <p className="text-md text-muted-foreground font-semibold mb-2">
+              Upload company registration document
+            </p>
+            <div className="text-sm text-muted-foreground mt-2 flex flex-col">
+              <p>1. Upload your SEC Registration</p>
+              <p>
+                2. Ensure that the characters on the documentation are not
+                deformed or flared.
+              </p>
+              <p>
+                3. The uploaded file must be less than 10 MB, and in JPG, PNG,
+                JPEG or PDF format.
+                <span
+                  onClick={() => setSecSampleModal(true)}
+                  className="font-semibold text-orange-600 cursor-pointer"
+                >
+                  View Sample
+                </span>
+              </p>
+            </div>
+            <ImageUpload
+              disabled={loading}
+              imageCount={1}
+              className="mt-5"
+              onImageUpload={(url) => setSec(url)}
+              defaultValue={sec}
+            />
+          </div>
+        )}
         <div className="bg-white shadow-sm rounded-md border mt-4 mb-4 py-6 px-5">
           <p className="text-md text-muted-foreground font-semibold">
             Certificate of Registration (COR): Bureau of Internal Revenue (BIR)
@@ -346,15 +629,19 @@ const OnboardingForm = () => {
             are supported. Please only upload your COR. By uploading your COR,
             you agree to have your COR displayed on your shop profile in
             accordance with local regulations.{" "}
-            <span className="font-semibold text-orange-600 cursor-pointer">
+            <span
+              onClick={() => setBirSampleModal(true)}
+              className="font-semibold text-orange-600 cursor-pointer"
+            >
               View Sample
             </span>
           </p>
           <ImageUpload
+            disabled={loading}
             imageCount={3}
             className="mt-5"
-            onImageUpload={() => {}}
-            defaultValue=""
+            onImageUpload={(url) => setBir(url)}
+            defaultValue={bir}
           />
         </div>
         <div className="bg-white shadow-sm rounded-md border mt-4 mb-4 py-6 px-5">
@@ -378,20 +665,38 @@ const OnboardingForm = () => {
           <div className="grid md:grid-cols-3 grid-cols-1 gap-3 mt-2">
             <div className="flex flex-col space-y-2">
               <Label className="text-muted-foreground mt-2">Given Name</Label>
-              <Input className="mt-2" placeholder="Given Name" />
+              <Input
+                className="mt-2"
+                value={givenName}
+                disabled={loading}
+                onChange={(e) => setGivenName(e.target.value)}
+                placeholder="Given Name"
+              />
             </div>
             <div className="flex flex-col space-y-2">
               <Label className="text-muted-foreground mt-2">Middle Name</Label>
-              <Input className="mt-2" placeholder="Middle Name (if you have)" />
+              <Input
+                className="mt-2"
+                value={middleName}
+                disabled={loading}
+                onChange={(e) => setMiddleName(e.target.value)}
+                placeholder="Middle Name (if you have)"
+              />
             </div>
             <div className="flex flex-col space-y-2">
               <Label className="text-muted-foreground mt-2">Family Name</Label>
-              <Input className="mt-2" placeholder="Family Name" />
+              <Input
+                className="mt-2"
+                value={familyName}
+                disabled={loading}
+                onChange={(e) => setFamilyName(e.target.value)}
+                placeholder="Family Name"
+              />
             </div>
           </div>
         </div>
         <div className="flex items-start gap-3 mt-4">
-          <Checkbox className="mt-1" />
+          <Checkbox disabled={loading} className="mt-1" />
           <p className="text-sm text-muted-foreground">
             I agree to the{" "}
             <span className="text-orange-600 font-semibold">
@@ -409,16 +714,15 @@ const OnboardingForm = () => {
         <div className="flex items-center mt-4 justify-end gap-2">
           <Button
             type="button"
+            disabled={loading}
             onClick={() => setCancelModal(true)}
             variant="outline"
           >
             Cancel
           </Button>
           <Button
-            type="button"
-            onClick={() =>
-              window.location.assign("/seller/account/finishing-setup")
-            }
+            disabled={loading}
+            type="submit"
             className="bg-orange-600 hover:bg-orange-600/80"
           >
             Submit

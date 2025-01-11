@@ -14,12 +14,14 @@ const ImageUpload = ({
   onImageUpload,
   className,
   defaultValue = "",
-  imageCount
+  imageCount,
+  disabled
 }: {
   onImageUpload: (url: string) => void;
   defaultValue?: string;
   className?: string;
   imageCount: number;
+  disabled?: boolean;
 }) => {
   const [imageUrl, setImageUrl] = useState<string>(defaultValue);
 
@@ -72,7 +74,7 @@ const ImageUpload = ({
       <div
         {...getRootProps({
           className:
-            "border-dashed border-[3px] rounded-xl cursor-pointer h-[200px] flex justify-center items-center flex-col",
+            `border-dashed border-[3px] rounded-xl h-[200px] flex justify-center items-center flex-col ${disabled ? "pointer-events-none opacity-50 cursor-not-allowed" : "cursor-pointer"}`,
         })}
       >
         <input {...getInputProps()} />
