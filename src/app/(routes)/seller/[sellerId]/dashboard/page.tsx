@@ -6,13 +6,14 @@ import Image from "next/image";
 import SettingUpForm from "../_components/setting-up-form";
 import { Badge } from "@/components/ui/badge";
 
-const SellerDashboard = async ({
-  params,
-}: {
-  params: {
-    sellerId: string;
-  };
-}) => {
+const SellerDashboard = async (
+  props: {
+    params: Promise<{
+      sellerId: string;
+    }>;
+  }
+) => {
+  const params = await props.params;
   const seller = await db.seller.findUnique({
     where: {
       id: params.sellerId,

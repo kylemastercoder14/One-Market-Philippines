@@ -2,7 +2,8 @@ import React from "react";
 import Heading from "@/components/ui/heading";
 import ProductForm from "../_components/product-form";
 
-const CreateProduct = async ({ params }: { params: { sellerId: string } }) => {
+const CreateProduct = async (props: { params: Promise<{ sellerId: string }> }) => {
+  const params = await props.params;
   return (
     <>
       <Heading
