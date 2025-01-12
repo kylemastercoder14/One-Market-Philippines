@@ -9,7 +9,7 @@ import LoginForm from '../../_components/login-form';
 const Login = () => {
   return (
     <>
-      <header className="sticky inset-x-0 top-0 z-10">
+      <header className="sticky inset-x-0 bg-white top-0 z-50">
         <div className="flex border-b items-center px-40 py-4 font-helveticaRegular justify-between">
           <div className="flex items-center gap-1">
             <Image src="/images/logo.png" alt="Logo" width={60} height={60} />

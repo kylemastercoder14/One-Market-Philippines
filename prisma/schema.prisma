@@ -27,6 +27,7 @@ model Seller {
   contactPerson String?
   contactNumber String?
   nationality String?
+  isReturnAddress Boolean? @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

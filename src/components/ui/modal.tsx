@@ -10,8 +10,8 @@ import {
 import React from "react";
 
 interface ModalProps {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   isOpen: boolean;
   onClose?: () => void;
   children?: React.ReactNode;
@@ -39,10 +39,13 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={className}>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
+        {title ||
+          (description && (
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+              <DialogDescription>{description}</DialogDescription>
+            </DialogHeader>
+          ))}
         <div>{children}</div>
       </DialogContent>
     </Dialog>

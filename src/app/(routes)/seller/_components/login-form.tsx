@@ -18,88 +18,43 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Eye, EyeClosed } from "lucide-react";
 import { toast } from "sonner";
-import { createSeller, sendOtpCode } from "@/actions/seller";
+import { createSeller, loginSeller, sendOtpCode } from "@/actions/seller";
 
 const formSchema = z.object({
   email: z
     .string()
     .min(1, { message: "Email is required" })
     .email({ message: "Invalid email" }),
-  emailVerificationCode: z
-    .string()
-    .min(1, { message: "Email Verification Code is required" }),
   password: z.string().min(1, { message: "Password is required" }),
-  confirmPassword: z
-    .string()
-    .min(1, { message: "Confirm password is required" }),
 });
-
-const refinedFormSchema = formSchema.refine(
-  (data) => data.password === data.confirmPassword,
-  {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  }
-);
 
 const LoginForm = () => {
   const router = useRouter();
-  const [showVerificationInput, setShowVerificationInput] = useState(false);
-  const [disableSendCode, setDisableSendCode] = useState(true);
   const [resendTimer, setResendTimer] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
-  const [showPassword1, setShowPassword1] = useState(false);
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [passwordRequirements, setPasswordRequirements] = useState({
-    hasNumber: false,
-    hasLetter: false,
-    hasSpecialChar: false,
-    isValidLength: false,
-  });
-
-  const checkPasswordRequirements = (password: string) => {
-    setPasswordRequirements({
-      hasNumber: /\d/.test(password),
-      hasLetter: /[a-zA-Z]/.test(password),
-      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-      isValidLength: password.length >= 6 && password.length <= 20,
-    });
-  };
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
-  };
-
-  const handleShowPassword1 = () => {
-    setShowPassword1(!showPassword1);
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      emailVerificationCode: "",
       password: "",
-      confirmPassword: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     try {
-      const res = await createSeller(values);
+      const res = await loginSeller(values.email, values.password);
       if (res.error) {
         toast.error(res.error);
       } else {
-        toast.success(res.success);
-        setTimeout(
-          () =>
-            router.push(
-              `/seller/account/onboarding?email=${res.seller?.email}`
-            ),
-          2000
-        );
+        toast.success("Login successful. Redirecting to dashboard...");
+        setTimeout(() => router.push(`/seller/${res.seller}/dashboard`), 2000);
       }
     } catch (error) {
       console.log(error);
@@ -108,30 +63,6 @@ const LoginForm = () => {
       setLoading(false);
     }
   }
-
-  const handleSendOtp = async () => {
-    try {
-      const res = await sendOtpCode(form.getValues("email"));
-      if (res.error) {
-        toast.error(res.error);
-      } else {
-        toast.success(res.success);
-        setDisableSendCode(true);
-        setResendTimer(60);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("An error occurred. Please try again later.");
-    }
-  };
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (resendTimer > 0) {
-      timer = setTimeout(() => setResendTimer((prev) => prev - 1), 1000);
-    }
-    return () => clearTimeout(timer);
-  }, [resendTimer]);
 
   return (
     <Form {...form}>
@@ -145,18 +76,7 @@ const LoginForm = () => {
               <FormItem>
                 <FormLabel>Email Address</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Enter your email address"
-                    {...field}
-                    onChange={(e) => {
-                      const email = e.target.value.trim();
-                      field.onChange(e);
-                      const isValidEmail =
-                        formSchema.shape.email.safeParse(email).success;
-                      setDisableSendCode(!isValidEmail);
-                      setShowVerificationInput(email.length > 0);
-                    }}
-                  />
+                  <Input placeholder="Enter your email address" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

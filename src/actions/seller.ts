@@ -231,7 +231,7 @@ export const loginSeller = async (email: string, password: string) => {
       path: "/", // Adjust path as needed
     });
 
-    return { token: jwt };
+    return { token: jwt, seller: seller.id };
   } catch (error) {
     console.error("Error logging in:", error);
     return { error: "Failed to login." };
@@ -240,4 +240,60 @@ export const loginSeller = async (email: string, password: string) => {
 
 export const logoutSeller = async () => {
   (await cookies()).set("Authorization", "", { maxAge: 0, path: "/" });
+};
+
+export const finishSettingUpSeller = async (
+  nationality: string,
+  residentialAddress: string,
+  streetAddress: string,
+  contactPerson: string,
+  phoneNumber: string,
+  isReturnRefundAddress: boolean,
+  sellerId: string
+) => {
+  if (
+    !residentialAddress ||
+    !streetAddress ||
+    !contactPerson ||
+    !phoneNumber ||
+    !nationality
+  ) {
+    return { error: "Please fill in all required fields" };
+  }
+
+  if (!sellerId) {
+    return { error: "Invalid seller ID" };
+  }
+
+  try {
+    const existingSeller = await db.seller.findUnique({
+      where: {
+        id: sellerId,
+      },
+    });
+
+    if (!existingSeller) {
+      return { error: "Seller not found" };
+    }
+
+    const completeAddress = `${residentialAddress}, ${streetAddress}`;
+
+    await db.seller.update({
+      where: {
+        id: sellerId,
+      },
+      data: {
+        residentialAddress: completeAddress,
+        nationality,
+        contactNumber: phoneNumber,
+        contactPerson,
+        isReturnAddress: isReturnRefundAddress,
+      },
+    });
+
+    return { success: "Seller setup completed" };
+  } catch (error) {
+    console.error("Error finishing seller setup:", error);
+    return { error: "An error occurred. Please try again later." };
+  }
 };
