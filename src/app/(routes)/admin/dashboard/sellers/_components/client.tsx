@@ -6,7 +6,6 @@ const SellersClient = ({ data }: { data: SellersColumn[] }) => {
   return (
     <div>
       <DataTable
-        loading
         searchKey="name"
         columns={columns}
         data={data}
