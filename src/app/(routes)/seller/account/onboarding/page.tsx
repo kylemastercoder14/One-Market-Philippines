@@ -1,6 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import OnboardingForm from "../../_components/onboarding-form";
 
@@ -37,7 +39,9 @@ const Onboarding = () => {
             </p>
           </div>
         </div>
-        <OnboardingForm />
+        <Suspense fallback={<p>Loading...</p>}>
+          <OnboardingForm />
+        </Suspense>
       </div>
     </>
   );
