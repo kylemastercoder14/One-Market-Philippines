@@ -80,7 +80,7 @@ const SettingUpForm = ({ sellerId }: { sellerId: string }) => {
         toast.error(res.error);
       } else {
         toast.success(res.success);
-        router.push(`/seller/${sellerId}/home`);
+        router.push(`/seller/${sellerId}/products/create`);
       }
     } catch (error) {
       console.error("Error submitting form:", error);

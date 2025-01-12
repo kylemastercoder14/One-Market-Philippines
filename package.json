@@ -40,6 +40,8 @@
     "@radix-ui/react-toggle-group": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.6",
     "@react-email/components": "^0.0.32",
+    "@tabler/icons-react": "^3.28.1",
+    "@tanstack/react-table": "^8.20.6",
     "aws": "^0.0.3-2",
     "aws-sdk": "^2.1692.0",
     "class-variance-authority": "^0.7.1",

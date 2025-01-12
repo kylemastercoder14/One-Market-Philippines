@@ -5,7 +5,6 @@ import BusinessType, { RadioGroup } from "./business-type";
 import { CheckIcon, ExternalLink } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import ImageUpload from "@/components/globals/image-upload";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import AlertModal from "@/components/ui/alert-modal";
 import { toast } from "sonner";
 import { finishingSellerData } from "@/actions/seller";
+import SingleImageUpload from "@/components/globals/single-image-upload";
 
 const OnboardingForm = () => {
   const searchParams = useSearchParams();
@@ -502,12 +502,11 @@ const OnboardingForm = () => {
                 </span>
               </p>
             </div>
-            <ImageUpload
+            <SingleImageUpload
               disabled={loading}
-              imageCount={1}
               className="mt-5"
-              onImageUpload={(url) => setIdentity(url)}
               defaultValue={identity}
+              onSingleImageUpload={(url) => setIdentity(url)}
             />
           </div>
         )}
@@ -533,12 +532,11 @@ const OnboardingForm = () => {
                 </span>
               </p>
             </div>
-            <ImageUpload
+            <SingleImageUpload
               disabled={loading}
-              imageCount={1}
               className="mt-5"
-              onImageUpload={(url) => setDti(url)}
               defaultValue={dti}
+              onSingleImageUpload={(url) => setDti(url)}
             />
           </div>
         )}
@@ -564,12 +562,11 @@ const OnboardingForm = () => {
                 </span>
               </p>
             </div>
-            <ImageUpload
+            <SingleImageUpload
               disabled={loading}
-              imageCount={1}
               className="mt-5"
-              onImageUpload={(url) => setSec(url)}
               defaultValue={sec}
+              onSingleImageUpload={(url) => setSec(url)}
             />
           </div>
         )}
@@ -595,12 +592,11 @@ const OnboardingForm = () => {
                 </span>
               </p>
             </div>
-            <ImageUpload
+            <SingleImageUpload
               disabled={loading}
-              imageCount={1}
               className="mt-5"
-              onImageUpload={(url) => setSec(url)}
               defaultValue={sec}
+              onSingleImageUpload={(url) => setSec(url)}
             />
           </div>
         )}
@@ -636,12 +632,11 @@ const OnboardingForm = () => {
               View Sample
             </span>
           </p>
-          <ImageUpload
+          <SingleImageUpload
             disabled={loading}
-            imageCount={3}
             className="mt-5"
-            onImageUpload={(url) => setBir(url)}
             defaultValue={bir}
+            onSingleImageUpload={(url) => setBir(url)}
           />
         </div>
         <div className="bg-white shadow-sm rounded-md border mt-4 mb-4 py-6 px-5">
